@@ -6,7 +6,7 @@ import PostListPage from './pages/PostListPage';
 import WritePage from './pages/WritePage';
 import PostPage from './pages/PostPage';
 
-import logo from './logo.svg';
+//import logo from './logo.svg';
 import './App.css';
 
 function App() {
@@ -14,9 +14,9 @@ function App() {
     <>
       <Route component={RegisterPage} path="/register" />
       <Route component={LoginPage} path="/login" />
+      <Route component={WritePage} path="/write" />
       <Route component={PostListPage} path={['/@:username', '/']} exact />
       <Route component={PostPage} path="/@:username/:postId" />
-      <Route component={WritePage} path="/write" />
     </>
   );
 }
