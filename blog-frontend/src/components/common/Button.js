@@ -21,15 +21,17 @@ const buttonStyle = css`
   ${props =>
     props.fullWidth &&
     css`
-        padding-top: 0.75rem;
-        padding-bottom:0.75rem;
-        width: 100%
-        font-size: 1.125rem;
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+      margin: 1%;
+      width: 100%;
+      font-size: 1.125rem;
     `}
   ${props =>
     props.cyan &&
     css`
       background: ${palette.cyan[5]};
+      width: 100%;
       &:hover {
         background: ${palette.cyan[4]};
       }

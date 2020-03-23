@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
+import OAuth from '../../components/auth/OAuth';
 
 // 회원가입 & 로그인폼을 보여줌
 
@@ -62,6 +63,7 @@ const ErrorMessage = styled.div`
 
 const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
   const text = textMap[type];
+  console.log(OAuth);
   return (
     <AuthFormBlock>
       <h3>{text}</h3>
@@ -96,7 +98,22 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
         <ButtonWithMarginTop cyan fullWidth>
           {text}
         </ButtonWithMarginTop>
+        <span>
+          {' '}
+          <a>아이디 저장</a>
+          <input type="checkbox" />
+        </span>
       </form>
+      <br />
+      <Button fullWidth onClick={OAuth}>
+        KAKAO
+      </Button>
+      <br />
+      <Button fullWidth>NAVER</Button>
+      <br />
+      <Button fullWidth>GOOGLE</Button>
+      <br />
+      <Button fullWidth>FACEBOOK</Button>
       <Footer>
         {type === 'login' ? (
           <Link to="/register">회원가입</Link>

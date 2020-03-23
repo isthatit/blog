@@ -1,5 +1,8 @@
-import Joi from 'joi';
+import Joi, { options } from 'joi';
 import User from '../../models/user';
+import axios from 'axios';
+import http from 'http';
+
 export const register = async ctx => {
   const schema = Joi.object().keys({
     username: Joi.string()
@@ -81,4 +84,28 @@ export const check = async ctx => {
 export const logout = async ctx => {
   ctx.cookies.set('access_token');
   ctx.status = 204; // No content
+};
+
+export const kakao = async ctx => {
+  const { code } = ctx.query;
+  ctx.status = 200;
+  const { K_CLIENT_ID } = process.env;
+
+  console.log(`code: ${code} \n K_CLIENT_ID: ${K_CLIENT_ID}`);
+  const data = {
+    grant_type: 'authorization_code',
+    client_id: K_CLIENT_ID,
+    redirect_uri: 'http://localhost:4000/api/auth/kakao',
+    code: code,
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+    },
+  };
+  const result = await axios.post('https://kauth.kakao.com/oauth/token', {
+    params: data,
+  });
+
+  http.request(options);
+
+  return;
 };
