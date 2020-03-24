@@ -99,7 +99,6 @@ const AuthForm = ({ type, form, onChange, onSubmit, error }) => {
           {text}
         </ButtonWithMarginTop>
         <span>
-          {' '}
           <a>아이디 저장</a>
           <input type="checkbox" />
         </span>

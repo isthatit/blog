@@ -1,6 +1,6 @@
 import Post from '../../models/post';
 import mongoose from 'mongoose';
-import Joi from 'joi';
+import Joi from '@hapi/joi';
 
 const { ObjectId } = mongoose.Types;
 
@@ -22,7 +22,7 @@ export const write = async ctx => {
       .required(),
   });
 
-  const result = Joi.validate(ctx.request.body, schema);
+  const result = schema.validate(ctx.request.body);
   if (result.error) {
     ctx.status = 400;
     ctx.body = result.error;
@@ -98,7 +98,7 @@ export const update = async ctx => {
     tags: Joi.array().items(Joi.string()),
   });
 
-  const result = Joi.validate(ctx.request.body, schema);
+  const result = schema.validate(ctx.request.body);
   if (result.error) {
     ctx.status = 400;
     ctx.body = result.error;

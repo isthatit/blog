@@ -1,7 +1,6 @@
-import Joi, { options } from 'joi';
+import Joi, { options } from '@hapi/joi';
 import User from '../../models/user';
-import axios from 'axios';
-import http from 'http';
+import http from 'https';
 
 export const register = async ctx => {
   const schema = Joi.object().keys({
@@ -12,7 +11,7 @@ export const register = async ctx => {
       .required(),
     password: Joi.string().required(),
   });
-  const result = Joi.validate(ctx.request.body, schema);
+  const result = schema.validate(ctx.request.body);
   if (result.error) {
     ctx.status = 400;
     ctx.body = result.error;
@@ -87,25 +86,80 @@ export const logout = async ctx => {
 };
 
 export const kakao = async ctx => {
-  const { code } = ctx.query;
-  ctx.status = 200;
+  const { code } = await ctx.query;
   const { K_CLIENT_ID } = process.env;
 
-  console.log(`code: ${code} \n K_CLIENT_ID: ${K_CLIENT_ID}`);
-  const data = {
+  console.log(code);
+
+  const data = JSON.stringify({
     grant_type: 'authorization_code',
     client_id: K_CLIENT_ID,
     redirect_uri: 'http://localhost:4000/api/auth/kakao',
     code: code,
-    headers: {
-      'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-    },
-  };
-  const result = await axios.post('https://kauth.kakao.com/oauth/token', {
-    params: data,
   });
+  const query = `?grant_type=authorization_code&client_id=${K_CLIENT_ID}&redirect_uri=http://localhost:4000/api/auth/kakao&code=${code}`;
 
-  http.request(options);
+  const options = {
+    hostname: 'kauth.kakao.com',
+    port: 443,
+    path: '/oauth/token' + query,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+    },
+    data,
+  };
+  let serverData = '';
 
-  return;
+  const result = await http
+    .request(options, res => {
+      res.on('data', chunk => {
+        serverData += chunk;
+      });
+      res.on('end', () => {
+        console.log('received..');
+        const { access_token } = JSON.parse(serverData);
+
+        return getUserInfo(access_token);
+      });
+    })
+    .end();
+
+  console.log(result);
+
+  ctx.state = 200;
+
+  return result;
+};
+
+const getUserInfo = async access_token => {
+  console.log('init?', access_token.length);
+  const result = await http
+    .request(
+      {
+        hostname: 'kapi.kakao.com',
+        path: '/v2/user/me',
+        port: 443,
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+        },
+      },
+      res => {
+        console.log('init..');
+        let subResult = '';
+        res.on('data', chunk => {
+          console.log('received..??');
+          subResult += chunk;
+        });
+        res.on('error', e => console.error(e));
+        res.on('end', () => {
+          return subResult;
+        });
+      },
+    )
+    .end();
+
+  return result;
 };
